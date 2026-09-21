@@ -79,22 +79,4 @@ SARUTO's Cloud AI Landing Portal
                 stroke-width="1"/>
 
  </g>
- <!-- TYPOGRAPHY: SARUTO AI -->
-                                                           <text x="250" y="425" 
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
-          font-size="32" 
-          font-weight="900" 
-          fill="#ffffff" 
-          text-anchor="middle" 
-          letter-spacing="0.32em" 
-          filter="url(#soft-blur)" 
-          opacity="0.4">SARUTO AI</text>
-
-    <text x="250" y="425" 
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
-          font-size="32" 
-          font-weight="900" 
-          fill="#ffffff" 
-          text-anchor="middle" 
-          letter-spacing="0.32em">SARUTO AI</text>
 </svg>
