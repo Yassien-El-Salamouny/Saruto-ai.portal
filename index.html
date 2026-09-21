@@ -173,57 +173,68 @@
     </div>
 
     <script>
-        const progressEl = document.getElementById("progress");
-        const statusEl = document.getElementById("status");
-        const timerEl = document.getElementById("timer");
+    const progressEl = document.getElementById("progress");
+    const statusEl = document.getElementById("status");
+    const timerEl = document.getElementById("timer");
 
-        // Timer decoupler
-        let elapsedSeconds = 0;
-        setInterval(() => {
-            elapsedSeconds++;
-            timerEl.innerText = `${elapsedSeconds}s`;
-        }, 1000);
+    // REPLACE THIS WITH YOUR REAL CLOUDFLARE WORKER URL
+    const PROXY_BOOT_URL = "https://kaggle-boot-proxy.thegamerx761.workers.dev"; 
 
-        // LOOP-PROOF SERVER CHECK
-        let isRedirecting = false;
+    let elapsedSeconds = 0;
+    setInterval(() => {
+        elapsedSeconds++;
+        if (timerEl) timerEl.innerText = `${elapsedSeconds}s`;
+    }, 1000);
 
-        async function checkServerStatus() {
-            if (isRedirecting) return;
+    let isRedirecting = false;
 
-            let progressVal = Math.min((elapsedSeconds / 60) * 100, 92);
-            progressEl.style.width = `${progressVal}%`;
-            statusEl.innerText = `Connecting... (${elapsedSeconds}s)`;
+    // 1. Fire boot request to Cloudflare Proxy on page load
+    async function triggerKaggleBoot() {
+        try {
+            if (statusEl) statusEl.innerText = "Waking up Kaggle server...";
+            await fetch(PROXY_BOOT_URL, { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+        } catch (e) {
+            console.log("Boot signal sent or backend already processing.");
+        }
+    }
 
-            try {
-                // Fetch the site data and completely bypass the browser's DNS cache
-                let res = await fetch(window.location.href, { cache: "no-store" });
-                let htmlContent = await res.text();
+    // 2. Poll the domain to check if Open WebUI took over Localtunnel/Gargantua
+    async function checkServerStatus() {
+        if (isRedirecting) return;
+
+        let progressVal = Math.min((elapsedSeconds / 90) * 100, 95);
+        if (progressEl) progressEl.style.width = `${progressVal}%`;
+        if (statusEl) statusEl.innerText = `Connecting... (${elapsedSeconds}s)`;
+
+        try {
+            let res = await fetch(window.location.href, { cache: "no-store" });
+            let htmlContent = await res.text();
+            
+            // Check if the holding/loading page is gone
+            if (!htmlContent.includes("gargantua")) {
+                isRedirecting = true;
+                if (progressEl) progressEl.style.width = "100%";
+                if (statusEl) statusEl.innerText = "Server Online! Redirecting...";
                 
-                // The video element has the ID "gargantua". 
-                // If OpenWebUI takes over the domain, this string will vanish, triggering the redirect.
-                if (!htmlContent.includes("gargantua")) {
-                    isRedirecting = true;
-                    progressEl.style.width = "100%";
-                    statusEl.innerText = "Server Online! Redirecting...";
-                    
+                setTimeout(() => {
+                    document.body.classList.add("warp-out");
                     setTimeout(() => {
-                        document.body.classList.add("warp-out");
-                        setTimeout(() => {
-                            // Reloading forces the browser to display the new OpenWebUI server
-                            window.location.reload(true);
-                        }, 800);
-                    }, 200);
-                } else {
-                    // Still seeing GitHub Pages portal. Keep waiting.
-                    setTimeout(checkServerStatus, 3500);
-                }
-            } catch (e) {
-                // Network error during DNS transition, keep trying
+                        window.location.reload(true);
+                    }, 800);
+                }, 200);
+            } else {
                 setTimeout(checkServerStatus, 3500);
             }
+        } catch (e) {
+            setTimeout(checkServerStatus, 3500);
         }
-
-        checkServerStatus();
-    </script>
+    }
+    // Run both tasks
+    triggerKaggleBoot();
+    checkServerStatus();
+</script>
 </body>
 </html>
