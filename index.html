@@ -3,184 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saruto AI Portal</title>
+    <title>Saruto AI — Initializing Workspace</title>
     <style>
+        :root {
+            --bg-color: #030508;
+            --surface-color: rgba(15, 23, 42, 0.65);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glow-color: rgba(255, 255, 255, 0.9);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #050508;
-            color: #ffffff;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
 
-        /* Black Hole Container */
-        .portal-container {
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .portal-card {
             position: relative;
-            width: 300px;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Accretion Disk Ring 1 */
-        .black-hole-ring-1 {
-            position: absolute;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-top-color: #6366f1;
-            border-right-color: #a855f7;
-            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
-            animation: spin 3s linear infinite;
-        }
-
-        /* Accretion Disk Ring 2 */
-        .black-hole-ring-2 {
-            position: absolute;
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-bottom-color: #3b82f6;
-            border-left-color: #ec4899;
-            filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.5));
-            animation: spin-reverse 2s linear infinite;
-        }
-
-        /* Event Horizon Center */
-        .event-horizon {
-            width: 140px;
-            height: 140px;
-            background: #000000;
-            border-radius: 50%;
-            box-shadow: inset 0 0 20px #000,
-                        0 0 35px rgba(255, 255, 255, 0.2),
-                        0 0 60px rgba(99, 102, 241, 0.4);
-            z-index: 2;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes spin-reverse {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        /* Status & UI Info */
-        .status-box {
-            margin-top: 40px;
-            text-align: center;
             z-index: 10;
+            background: var(--surface-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.2rem 2rem;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .title {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, #a855f7, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+        }
+
+        .progress-wrapper {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #94a3b8, #ffffff);
+            border-radius: 999px;
+            box-shadow: 0 0 12px var(--glow-color);
+            transition: width 0.4s ease;
         }
 
         .status-text {
-            font-size: 0.95rem;
-            color: #9ca3af;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
             font-family: monospace;
         }
 
-        .action-btn {
-            margin-top: 25px;
-            padding: 12px 28px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s ease;
-            display: none; /* Hidden until server checks pass or manual bypass is needed */
+        /* End-of-loading Supernova Transition */
+        .warp-out .portal-card {
+            opacity: 0;
+            transform: scale(0.9);
         }
 
-        .action-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+        .warp-out #canvas-container {
+            animation: gargantuaCollapse 1.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+
+        @keyframes gargantuaCollapse {
+            0% { transform: scale(1); filter: brightness(1); opacity: 1; }
+            30% { transform: scale(1.3); filter: brightness(3); opacity: 1; }
+            100% { transform: scale(0); filter: brightness(10); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="portal-container">
-        <div class="black-hole-ring-1"></div>
-        <div class="black-hole-ring-2"></div>
-        <div class="event-horizon"></div>
+    <div id="canvas-container">
+        <canvas id="gargantua"></canvas>
     </div>
 
-    <div class="status-box">
-        <div class="title">SARUTO AI ENGINE</div>
-        <div class="status-text" id="statusLabel">Initializing connection to saruto-ai.opik.net...</div>
-        <button class="action-btn" id="launchBtn" onclick="redirectToApp()">Enter OpenWebUI</button>
+    <div class="portal-card" id="card">
+        <h1 class="title">Saruto AI Workspace</h1>
+        <p class="subtitle">Dual-GPU Kaggle Infrastructure</p>
+        
+        <div class="progress-wrapper">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        
+        <div class="status-text" id="status">Connecting to saruto-ai.opik.net...</div>
     </div>
 
     <script>
-        // CONFIGURATION PLACEHOLDERS
         const TARGET_DOMAIN = "saruto-ai.opik.net";
-        const CHECK_INTERVAL_MS = 5000;
-        
-        const statusLabel = document.getElementById("statusLabel");
-        const launchBtn = document.getElementById("launchBtn");
+        const progressEl = document.getElementById("progress");
+        const statusEl = document.getElementById("status");
 
-        let targetUrl = `http://${TARGET_DOMAIN}`;
+        // --- GARGANTUA INTERSTELLAR BLACK HOLE ENGINE ---
+        const canvas = document.getElementById("gargantua");
+        const ctx = canvas.getContext("2d");
 
-        // Function to probe if Kaggle backend is online via DNS CNAME
-        async function checkServerStatus() {
-            try {
-                // Fetching image header or CORS check against the domain
-                const response = await fetch(targetUrl, { mode: 'no-cors', cache: 'no-cache' });
-                
-                statusLabel.innerText = "Server Active! Redirecting...";
-                statusLabel.style.color = "#10b981";
-                
-                setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 1000);
+        let width, height, centerX, centerY;
+        let particles = [];
+        const numParticles = 600;
 
-            } catch (err) {
-                statusLabel.innerText = "Server Offline / Booting Kaggle VM... Checking again in 5s";
-                statusLabel.style.color = "#f59e0b";
-                
-                // Show button as fallback option if pinging is blocked by CORS/Browser rules
-                launchBtn.style.display = "inline-block";
-                
-                setTimeout(checkServerStatus, CHECK_INTERVAL_MS);
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2 - 20;
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        class AccretionParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.angle = Math.random() * Math.PI * 2;
+                this.distance = Math.random() * 220 + 85; 
+                this.speed = (0.003 + Math.random() * 0.008) * (140 / this.distance);
+                this.size = Math.random() * 1.5 + 0.4;
+                this.alpha = Math.random() * 0.8 + 0.2;
+            }
+
+            update() {
+                this.angle += this.speed;
+                this.distance -= 0.05; 
+                if (this.distance < 75) this.reset();
+            }
+
+            draw() {
+                // Flatten coordinates for horizontal disk tilt
+                let x = centerX + Math.cos(this.angle) * this.distance * 2.2;
+                let y = centerY + Math.sin(this.angle) * (this.distance * 0.12);
+
+                // Gravitational Lensing effect (lensing arch behind event horizon)
+                const isBehind = Math.sin(this.angle) < 0;
+                if (isBehind) {
+                    const distFromCenter = Math.abs(x - centerX);
+                    if (distFromCenter < 170) {
+                        // Bend trajectory upward/downward into a halo arch
+                        const warpFactor = Math.cos((distFromCenter / 170) * (Math.PI / 2));
+                        y -= warpFactor * 85; 
+                    }
+                }
+
+                ctx.beginPath();
+                ctx.arc(x, y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = "#ffffff";
+                ctx.fill();
             }
         }
 
-        function redirectToApp() {
-            window.location.href = targetUrl;
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new AccretionParticle());
         }
 
-        // Start checking server once page loads
-        window.onload = () => {
-            checkServerStatus();
-        };
+        function drawGargantua() {
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Distant Background Glow
+            const outerGlow = ctx.createRadialGradient(centerX, centerY, 50, centerX, centerY, 300);
+            outerGlow.addColorStop(0, "rgba(255, 255, 255, 0.15)");
+            outerGlow.addColorStop(0.4, "rgba(200, 220, 255, 0.05)");
+            outerGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+            ctx.fillStyle = outerGlow;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 300, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Gravitational Lensing Arc (Top Arch)
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY - 15, 140, 90, 0, Math.PI, Math.PI * 2);
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#ffffff";
+            ctx.stroke();
+            ctx.restore();
+
+            // 3. Gravitational Lensing Arc (Bottom Arch)
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY + 15, 140, 90, 0, 0, Math.PI);
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#ffffff";
+            ctx.stroke();
+            ctx.restore();
+
+            // 4. Infalling Particles Swarm
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // 5. Bright Horizontal Accretion Line (Across Front)
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, 380, 12, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = "#ffffff";
+            ctx.fill();
+            ctx.restore();
+
+            // 6. Absolute Event Horizon Core
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 72, 0, Math.PI * 2);
+            ctx.fillStyle = "#000000";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#000000";
+            ctx.fill();
+
+            // 7. Thin Bright Photon Ring (Event Horizon Edge)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 73.5, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#ffffff";
+            ctx.stroke();
+
+            requestAnimationFrame(drawGargantua);
+        }
+        drawGargantua();
+
+        // --- HEALTHCHECK & REDIRECT ---
+        let attempts = 0;
+        async function checkServer() {
+            attempts++;
+            let percent = Math.min(attempts * 5, 90);
+            progressEl.style.width = percent + "%";
+
+            try {
+                let res = await fetch(`http://${TARGET_DOMAIN}`, { mode: 'no-cors' });
+                progressEl.style.width = "100%";
+                statusEl.innerText = "Server Online! Opening OpenWebUI...";
+                
+                setTimeout(() => {
+                    document.body.classList.add("warp-out");
+                    setTimeout(() => {
+                        window.location.href = `http://${TARGET_DOMAIN}`;
+                    }, 1100);
+                }, 400);
+
+            } catch (e) {
+                statusEl.innerText = `Waiting for Kaggle VM... (${attempts * 3}s)`;
+                setTimeout(checkServer, 3000);
+            }
+        }
+
+        checkServer();
     </script>
 </body>
 </html>
