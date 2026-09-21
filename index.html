@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saruto AI Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #050508;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Black Hole Container */
+        .portal-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Accretion Disk Ring 1 */
+        .black-hole-ring-1 {
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #6366f1;
+            border-right-color: #a855f7;
+            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
+            animation: spin 3s linear infinite;
+        }
+
+        /* Accretion Disk Ring 2 */
+        .black-hole-ring-2 {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-bottom-color: #3b82f6;
+            border-left-color: #ec4899;
+            filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.5));
+            animation: spin-reverse 2s linear infinite;
+        }
+
+        /* Event Horizon Center */
+        .event-horizon {
+            width: 140px;
+            height: 140px;
+            background: #000000;
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px #000,
+                        0 0 35px rgba(255, 255, 255, 0.2),
+                        0 0 60px rgba(99, 102, 241, 0.4);
+            z-index: 2;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spin-reverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Status & UI Info */
+        .status-box {
+            margin-top: 40px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            color: #9ca3af;
+            font-family: monospace;
+        }
+
+        .action-btn {
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            display: none; /* Hidden until server checks pass or manual bypass is needed */
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="black-hole-ring-1"></div>
+        <div class="black-hole-ring-2"></div>
+        <div class="event-horizon"></div>
+    </div>
+
+    <div class="status-box">
+        <div class="title">SARUTO AI ENGINE</div>
+        <div class="status-text" id="statusLabel">Initializing connection to saruto-ai.opik.net...</div>
+        <button class="action-btn" id="launchBtn" onclick="redirectToApp()">Enter OpenWebUI</button>
+    </div>
+
+    <script>
+        // CONFIGURATION PLACEHOLDERS
+        const TARGET_DOMAIN = "saruto-ai.opik.net";
+        const CHECK_INTERVAL_MS = 5000;
+        
+        const statusLabel = document.getElementById("statusLabel");
+        const launchBtn = document.getElementById("launchBtn");
+
+        let targetUrl = `http://${TARGET_DOMAIN}`;
+
+        // Function to probe if Kaggle backend is online via DNS CNAME
+        async function checkServerStatus() {
+            try {
+                // Fetching image header or CORS check against the domain
+                const response = await fetch(targetUrl, { mode: 'no-cors', cache: 'no-cache' });
+                
+                statusLabel.innerText = "Server Active! Redirecting...";
+                statusLabel.style.color = "#10b981";
+                
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 1000);
+
+            } catch (err) {
+                statusLabel.innerText = "Server Offline / Booting Kaggle VM... Checking again in 5s";
+                statusLabel.style.color = "#f59e0b";
+                
+                // Show button as fallback option if pinging is blocked by CORS/Browser rules
+                launchBtn.style.display = "inline-block";
+                
+                setTimeout(checkServerStatus, CHECK_INTERVAL_MS);
+            }
+        }
+
+        function redirectToApp() {
+            window.location.href = targetUrl;
+        }
+
+        // Start checking server once page loads
+        window.onload = () => {
+            checkServerStatus();
+        };
+    </script>
+</body>
+</html>
