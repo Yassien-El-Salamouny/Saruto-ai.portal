@@ -61,6 +61,14 @@
             transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        /* Logo Styling */
+        .brand-logo {
+            width: 85px;
+            height: auto;
+            margin: 0 auto 0.5rem auto;
+            display: block;
+        }
+
         .title {
             font-size: clamp(1.1rem, 3.8vw, 1.25rem);
             font-weight: 600;
@@ -115,7 +123,6 @@
             font-weight: 600;
         }
 
-        /* Supernova Warp Out Transition */
         .warp-out .portal-card {
             opacity: 0;
             transform: translateY(15px) scale(0.95);
@@ -139,6 +146,9 @@
     </div>
 
     <div class="portal-card" id="card">
+        <!-- New Boundless Logo -->
+        <img src="assets/Boundless.svg" alt="Saruto AI" class="brand-logo">
+        
         <h1 class="title">Saruto AI Workspace</h1>
         <p class="subtitle">Dual-GPU Kaggle Infrastructure</p>
         
@@ -147,13 +157,12 @@
         </div>
         
         <div class="status-wrapper">
-            <span class="status-text" id="status">Checking server...</span>
+            <span class="status-text" id="status">Checking DNS routing...</span>
             <span class="timer-text" id="timer">0s</span>
         </div>
     </div>
 
     <script>
-        const TARGET_DOMAIN = "saruto-ai.opik.net";
         const progressEl = document.getElementById("progress");
         const statusEl = document.getElementById("status");
         const timerEl = document.getElementById("timer");
@@ -164,13 +173,10 @@
         let width, height, centerX, centerY;
         let particles = [];
         
-        // TILT ANGLE: ~14 degrees rotated clockwise (right)
         const TILT_ANGLE = 14 * (Math.PI / 180);
-
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const numParticles = isMobile ? 70 : 130;
 
-        // Offscreen static canvas cache for maximum performance
         let staticCanvas = document.createElement('canvas');
         let staticCtx = staticCanvas.getContext('2d');
 
@@ -179,7 +185,6 @@
             height = canvas.height = window.innerHeight;
             centerX = width / 2;
             centerY = isMobile ? height * 0.36 : height * 0.40;
-
             buildStaticCache();
         }
 
@@ -191,9 +196,8 @@
             staticCtx.translate(centerX, centerY);
             staticCtx.rotate(TILT_ANGLE);
 
-            const R_EVENT = 42; // Event Horizon Radius (Compact Size)
+            const R_EVENT = 42; 
 
-            // 1. Outer Deep Space Energy Glow
             const outerGlow = staticCtx.createRadialGradient(0, 0, R_EVENT, 0, 0, 180);
             outerGlow.addColorStop(0, "rgba(255, 235, 200, 0.22)");
             outerGlow.addColorStop(0.3, "rgba(180, 200, 255, 0.08)");
@@ -203,7 +207,6 @@
             staticCtx.arc(0, 0, 180, 0, Math.PI * 2);
             staticCtx.fill();
 
-            // 2. Gravitational Lensing - Upper Halo Arch
             const topArchGrad = staticCtx.createRadialGradient(0, -10, R_EVENT * 0.8, 0, -10, 100);
             topArchGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
             topArchGrad.addColorStop(0.35, "rgba(255, 220, 170, 0.6)");
@@ -215,7 +218,6 @@
             staticCtx.ellipse(0, -8, 88, 56, 0, Math.PI, Math.PI * 2);
             staticCtx.fill();
 
-            // 3. Gravitational Lensing - Lower Halo Arch
             const bottomArchGrad = staticCtx.createRadialGradient(0, 10, R_EVENT * 0.8, 0, 10, 100);
             bottomArchGrad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
             bottomArchGrad.addColorStop(0.35, "rgba(255, 210, 150, 0.5)");
@@ -227,12 +229,11 @@
             staticCtx.ellipse(0, 8, 88, 56, 0, 0, Math.PI);
             staticCtx.fill();
 
-            // 4. Main Accretion Beam Across Center (With Doppler Beaming Intensity)
             const diskGrad = staticCtx.createLinearGradient(-220, 0, 220, 0);
             diskGrad.addColorStop(0, "rgba(255, 255, 255, 0.05)");
-            diskGrad.addColorStop(0.2, "rgba(255, 245, 230, 0.95)"); // Bright approaching left side
+            diskGrad.addColorStop(0.2, "rgba(255, 245, 230, 0.95)"); 
             diskGrad.addColorStop(0.5, "rgba(255, 255, 255, 1.0)");
-            diskGrad.addColorStop(0.8, "rgba(255, 210, 160, 0.55)"); // Dimmer receding right side
+            diskGrad.addColorStop(0.8, "rgba(255, 210, 160, 0.55)"); 
             diskGrad.addColorStop(1, "rgba(255, 180, 120, 0)");
 
             staticCtx.fillStyle = diskGrad;
@@ -240,13 +241,11 @@
             staticCtx.ellipse(0, 0, 210, 6.5, 0, 0, Math.PI * 2);
             staticCtx.fill();
 
-            // 5. Absolute Pitch-Black Event Horizon
             staticCtx.beginPath();
             staticCtx.arc(0, 0, R_EVENT, 0, Math.PI * 2);
             staticCtx.fillStyle = "#020305";
             staticCtx.fill();
 
-            // 6. Sharp Luminous Photon Ring
             staticCtx.beginPath();
             staticCtx.arc(0, 0, R_EVENT + 1.2, 0, Math.PI * 2);
             staticCtx.strokeStyle = "rgba(255, 255, 255, 0.95)";
@@ -278,11 +277,9 @@
             }
 
             draw() {
-                // Horizontal disk coordinates
                 let x = Math.cos(this.angle) * this.distance * 2.0;
                 let y = Math.sin(this.angle) * (this.distance * 0.11);
 
-                // Gravitational bending behind event horizon
                 const isBehind = Math.sin(this.angle) < 0;
                 if (isBehind) {
                     const distFromCenter = Math.abs(x);
@@ -304,12 +301,9 @@
             particles.push(new AccretionParticle());
         }
 
-        // --- RENDER LOOP ---
         function renderFrame() {
-            // Draw pre-cached static background
             ctx.drawImage(staticCanvas, 0, 0);
 
-            // Render dynamic accretion particle swarm inside tilted space
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(TILT_ANGLE);
@@ -324,14 +318,14 @@
         }
         requestAnimationFrame(renderFrame);
 
-        // --- REALTIME 1-SECOND TIMER ---
+        // Timer decoupler
         let elapsedSeconds = 0;
         setInterval(() => {
             elapsedSeconds++;
             timerEl.innerText = `${elapsedSeconds}s`;
         }, 1000);
 
-        // --- HEALTHCHECK & REDIRECT ---
+        // LOOP-PROOF SERVER CHECK
         let isRedirecting = false;
 
         async function checkServerStatus() {
@@ -341,30 +335,35 @@
             progressEl.style.width = `${progressVal}%`;
             statusEl.innerText = `Connecting... (${elapsedSeconds}s)`;
 
-            const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-            const targetUrl = `${protocol}//${TARGET_DOMAIN}`;
-
             try {
-                await fetch(targetUrl, { mode: 'no-cors' });
+                // Fetch the site data and completely bypass the browser's DNS cache
+                let res = await fetch(window.location.href, { cache: "no-store" });
+                let htmlContent = await res.text();
                 
-                isRedirecting = true;
-                progressEl.style.width = "100%";
-                statusEl.innerText = "Server Online! Redirecting...";
-                
-                setTimeout(() => {
-                    document.body.classList.add("warp-out");
+                // If the downloaded HTML does NOT contain the word "gargantua",
+                // it means Dynu DNS has pointed away from GitHub Pages and OpenWebUI is live!
+                if (!htmlContent.includes("gargantua")) {
+                    isRedirecting = true;
+                    progressEl.style.width = "100%";
+                    statusEl.innerText = "Server Online! Redirecting...";
+                    
                     setTimeout(() => {
-                        window.location.href = targetUrl;
-                    }, 800);
-                }, 200);
-
+                        document.body.classList.add("warp-out");
+                        setTimeout(() => {
+                            // Reloading forces the browser to display the new OpenWebUI server
+                            window.location.reload(true);
+                        }, 800);
+                    }, 200);
+                } else {
+                    // Still seeing GitHub Pages portal. Keep waiting.
+                    setTimeout(checkServerStatus, 3500);
+                }
             } catch (e) {
-                // Retry every 3 seconds if offline
-                setTimeout(checkServerStatus, 3000);
+                // Network error during DNS transition, keep trying
+                setTimeout(checkServerStatus, 3500);
             }
         }
 
-        // Initial check trigger
         checkServerStatus();
     </script>
 </body>
