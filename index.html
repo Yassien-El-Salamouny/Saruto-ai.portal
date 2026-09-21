@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saruto AI</title>
-    <!-- Tab Bar Logo -->
+    <title>Saruto AI Workspace</title>
     <link rel="icon" type="image/svg+xml" href="assets/Boundless.svg">
     <style>
         :root {
-            /* Changed to pure black to blend seamlessly with video edges */
             --bg-color: #000000;
             --surface-color: rgba(10, 15, 26, 0.75);
             --border-color: rgba(255, 255, 255, 0.1);
@@ -38,19 +36,16 @@
             padding-bottom: clamp(20px, 4vh, 45px);
         }
 
-        /* Video Background Styling */
         #gargantua {
             position: absolute;
             top: 38%;
             left: 50%;
             width: 100vw;
             height: 100vh;
-            /* contain ensures the full black hole fits on screen without cropping */
             object-fit: contain;
             transform: translate(-50%, -50%);
             z-index: 1;
             pointer-events: none;
-            /* Converts the red/orange to crisp monochrome white */
             filter: grayscale(100%) brightness(1.2) contrast(1.1);
         }
 
@@ -70,7 +65,6 @@
             transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Logo Styling */
         .brand-logo {
             width: 85px;
             height: auto;
@@ -137,7 +131,6 @@
             transform: translateY(15px) scale(0.95);
         }
 
-        /* Video Collapse Animation */
         .warp-out #gargantua {
             animation: gargantuaCollapse 0.9s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
@@ -151,14 +144,12 @@
 </head>
 <body>
 
-    <!-- Video Element (playsinline is critical for iOS) -->
     <video id="gargantua" autoplay loop muted playsinline>
         <source src="assets/Black_hole.webm" type="video/webm">
     </video>
 
     <div class="portal-card" id="card">
         <img src="assets/Boundless.svg" alt="Saruto AI" class="brand-logo">
-        
         <h1 class="title">Saruto AI Workspace</h1>
         <p class="subtitle">Dual-GPU Kaggle Infrastructure</p>
         
@@ -167,7 +158,7 @@
         </div>
         
         <div class="status-wrapper">
-            <span class="status-text" id="status">Checking DNS routing...</span>
+            <span class="status-text" id="status">Connecting proxy...</span>
             <span class="timer-text" id="timer">0s</span>
         </div>
     </div>
@@ -177,7 +168,6 @@
     const statusEl = document.getElementById("status");
     const timerEl = document.getElementById("timer");
 
-    // REPLACE THIS WITH YOUR REAL CLOUDFLARE WORKER URL
     const PROXY_BOOT_URL = "https://kaggle-boot-proxy.thegamerx761.workers.dev"; 
 
     let elapsedSeconds = 0;
@@ -188,36 +178,39 @@
 
     let isRedirecting = false;
 
-    // 1. Fire boot request to Cloudflare Proxy on page load
+    // 1. Dispatch boot signal to Cloudflare Proxy
     async function triggerKaggleBoot() {
         try {
-            if (statusEl) statusEl.innerText = "Waking up Kaggle server...";
+            if (statusEl) statusEl.innerText = "Triggering Kaggle GPU VM...";
             await fetch(PROXY_BOOT_URL, { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
         } catch (e) {
-            console.log("Boot signal sent or backend already processing.");
+            console.log("Proxy trigger sent or session already warm.");
         }
     }
 
-    // 2. Poll the domain to check if Open WebUI took over Localtunnel/Gargantua
+    // 2. Poll current domain for Open WebUI takeover
     async function checkServerStatus() {
         if (isRedirecting) return;
 
-        let progressVal = Math.min((elapsedSeconds / 90) * 100, 95);
+        // Target timing: ~35 seconds for dataset wheel/model spinup
+        let progressVal = Math.min((elapsedSeconds / 35) * 100, 95);
         if (progressEl) progressEl.style.width = `${progressVal}%`;
-        if (statusEl) statusEl.innerText = `Connecting... (${elapsedSeconds}s)`;
+        if (statusEl) statusEl.innerText = `Launching Engines... (${elapsedSeconds}s)`;
 
         try {
-            let res = await fetch(window.location.href, { cache: "no-store" });
+            // Append timestamp to break browser HTTP cache
+            const cacheBustUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?_t=${Date.now()}`;
+            let res = await fetch(cacheBustUrl, { cache: "no-store" });
             let htmlContent = await res.text();
             
-            // Check if the holding/loading page is gone
+            // If response no longer contains loading screen mark, Open WebUI is serving!
             if (!htmlContent.includes("gargantua")) {
                 isRedirecting = true;
                 if (progressEl) progressEl.style.width = "100%";
-                if (statusEl) statusEl.innerText = "Server Online! Redirecting...";
+                if (statusEl) statusEl.innerText = "Online! Transitioning...";
                 
                 setTimeout(() => {
                     document.body.classList.add("warp-out");
@@ -226,15 +219,16 @@
                     }, 800);
                 }, 200);
             } else {
-                setTimeout(checkServerStatus, 3500);
+                setTimeout(checkServerStatus, 2500);
             }
         } catch (e) {
-            setTimeout(checkServerStatus, 3500);
+            setTimeout(checkServerStatus, 2500);
         }
     }
-    // Run both tasks
+
+    // Fire auto-boot and status polling
     triggerKaggleBoot();
     checkServerStatus();
-</script>
+    </script>
 </body>
 </html>
