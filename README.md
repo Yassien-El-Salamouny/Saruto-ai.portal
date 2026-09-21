@@ -1,7 +1,7 @@
 # Saruto-ai.portal
 SARUTO's Cloud AI Landing Portal
 
-<img width="150" height="150" alt="Boundless" src="https://github.com/user-attachments/assets/494fce43-6450-47e8-be0e-d4fc9d0f3184" />
+<img width="500" height="500" alt="Boundless" src="https://github.com/user-attachments/assets/494fce43-6450-47e8-be0e-d4fc9d0f3184" />
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
     <defs>
         <!-- Glow / Optical Bloom Filters -->
