@@ -80,7 +80,7 @@ SARUTO's Cloud AI Landing Portal
 
  </g>
  <!-- TYPOGRAPHY: SARUTO AI -->
-    <text x="250" y="425" 
+                                                           <text x="250" y="425" 
           font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
           font-size="32" 
           font-weight="900" 
@@ -90,7 +90,7 @@ SARUTO's Cloud AI Landing Portal
           filter="url(#soft-blur)" 
           opacity="0.4">SARUTO AI</text>
 
-<text x="250" y="425" 
+    <text x="250" y="425" 
           font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
           font-size="32" 
           font-weight="900" 
