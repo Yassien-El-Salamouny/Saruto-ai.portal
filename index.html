@@ -191,7 +191,7 @@
         }
     }
 
-    // 2. Poll current domain for Open WebUI takeover
+    // 2. Poll Cloudflare Proxy for ONLINE status, then redirect to tunnel URL
     async function checkServerStatus() {
         if (isRedirecting) return;
 
@@ -201,24 +201,27 @@
         if (statusEl) statusEl.innerText = `Launching Engines... (${elapsedSeconds}s)`;
 
         try {
-            // Append timestamp to break browser HTTP cache
-            const cacheBustUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?_t=${Date.now()}`;
-            let res = await fetch(cacheBustUrl, { cache: "no-store" });
-            let htmlContent = await res.text();
-            
-            // If response no longer contains loading screen mark, Open WebUI is serving!
-            if (!htmlContent.includes("gargantua")) {
+            const res = await fetch(PROXY_BOOT_URL, {
+                method: "GET",
+                cache: "no-store"
+            });
+            const data = await res.json();
+
+            if (data.status === "ONLINE" && data.redirect) {
                 isRedirecting = true;
                 if (progressEl) progressEl.style.width = "100%";
                 if (statusEl) statusEl.innerText = "Online! Transitioning...";
-                
+
                 setTimeout(() => {
                     document.body.classList.add("warp-out");
                     setTimeout(() => {
-                        window.location.reload(true);
+                        window.location.href = data.redirect;
                     }, 800);
                 }, 200);
             } else {
+                if (statusEl && data.kaggleStatus) {
+                    statusEl.innerText = `Kaggle: ${data.kaggleStatus} (${elapsedSeconds}s)`;
+                }
                 setTimeout(checkServerStatus, 2500);
             }
         } catch (e) {
