@@ -1,7 +1,7 @@
 # Saruto-ai.portal
 SARUTO's Cloud AI Landing Portal
 
-This project is currently disabled. This is only groundwork for a local AI server accessed via my website it's up but it will only show the loading animation nothing else, feel free to check it out.
+This project was a learning experience that's it. It's not an AI server it is, but it was a simple project that i did to understand more about this and the only thing I got out of it was a subdomain i own that I can now host many more things on. The website will be up as it fully free and needs nothing from me to run, but it will only show a loading black hole animation so this project is officially over. Feel free to check it out, if you want.
 
 <img width="300" height="300" alt="Boundless" src="https://github.com/user-attachments/assets/494fce43-6450-47e8-be0e-d4fc9d0f3184" allign-items = center />
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
