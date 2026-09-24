@@ -151,14 +151,14 @@
     <div class="portal-card" id="card">
         <img src="assets/Boundless.svg" alt="Saruto AI" class="brand-logo">
         <h1 class="title">Saruto AI Workspace</h1>
-        <p class="subtitle">Dual-GPU Kaggle Infrastructure</p>
+        <p class="subtitle">Always-On AI Infrastructure</p>
         
         <div class="progress-wrapper">
             <div class="progress-fill" id="progress"></div>
         </div>
         
         <div class="status-wrapper">
-            <span class="status-text" id="status">Connecting proxy...</span>
+            <span class="status-text" id="status">Initializing...</span>
             <span class="timer-text" id="timer">0s</span>
         </div>
     </div>
@@ -168,70 +168,37 @@
     const statusEl = document.getElementById("status");
     const timerEl = document.getElementById("timer");
 
-    const PROXY_BOOT_URL = "https://kaggle-boot-proxy.thegamerx761.workers.dev"; 
+    // ===== REPLACE THIS WITH YOUR TAILSCALE FUNNEL URL =====
+    // For testing in Codespaces, use your Codespaces forwarded port URL.
+    // For production, use your Tailscale Funnel URL (e.g., https://saruto-ai.tailnet-name.ts.net)
+    const FUNNEL_URL = "https://saruto-ai.tailnet-name.ts.net";
 
     let elapsedSeconds = 0;
+    const totalSeconds = 10;
+
     setInterval(() => {
         elapsedSeconds++;
         if (timerEl) timerEl.innerText = `${elapsedSeconds}s`;
     }, 1000);
 
-    let isRedirecting = false;
-
-    // 1. Dispatch boot signal to Cloudflare Proxy
-    async function triggerKaggleBoot() {
-        try {
-            if (statusEl) statusEl.innerText = "Triggering Kaggle GPU VM...";
-            await fetch(PROXY_BOOT_URL, { 
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            });
-        } catch (e) {
-            console.log("Proxy trigger sent or session already warm.");
-        }
-    }
-
-    // 2. Poll Cloudflare Proxy for ONLINE status, then redirect to tunnel URL
-    async function checkServerStatus() {
-        if (isRedirecting) return;
-
-        // Target timing: ~35 seconds for dataset wheel/model spinup
-        let progressVal = Math.min((elapsedSeconds / 35) * 100, 95);
+    // Animate progress bar over 10 seconds
+    const progressInterval = setInterval(() => {
+        const progressVal = Math.min((elapsedSeconds / totalSeconds) * 100, 100);
         if (progressEl) progressEl.style.width = `${progressVal}%`;
-        if (statusEl) statusEl.innerText = `Launching Engines... (${elapsedSeconds}s)`;
+        if (statusEl) statusEl.innerText = `Loading... (${elapsedSeconds}s)`;
+    }, 100);
 
-        try {
-            const res = await fetch(PROXY_BOOT_URL, {
-                method: "GET",
-                cache: "no-store"
-            });
-            const data = await res.json();
-
-            if (data.status === "ONLINE" && data.redirect) {
-                isRedirecting = true;
-                if (progressEl) progressEl.style.width = "100%";
-                if (statusEl) statusEl.innerText = "Online! Transitioning...";
-
-                setTimeout(() => {
-                    document.body.classList.add("warp-out");
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 800);
-                }, 200);
-            } else {
-                if (statusEl && data.kaggleStatus) {
-                    statusEl.innerText = `Kaggle: ${data.kaggleStatus} (${elapsedSeconds}s)`;
-                }
-                setTimeout(checkServerStatus, 2500);
-            }
-        } catch (e) {
-            setTimeout(checkServerStatus, 2500);
-        }
-    }
-
-    // Fire auto-boot and status polling
-    triggerKaggleBoot();
-    checkServerStatus();
+    // Redirect after 10 seconds
+    setTimeout(() => {
+        clearInterval(progressInterval);
+        if (progressEl) progressEl.style.width = "100%";
+        if (statusEl) statusEl.innerText = "Ready! Redirecting...";
+        
+        document.body.classList.add("warp-out");
+        setTimeout(() => {
+            window.location.href = FUNNEL_URL;
+        }, 800);
+    }, 10000);
     </script>
 </body>
 </html>
